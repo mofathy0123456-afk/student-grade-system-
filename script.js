@@ -1,161 +1,74 @@
-// 1. Create Student Class
 class Student {
-    constructor(name, id, grades) {
-        this.name = name;
-        this.id = id;
-        this.grades = grades;
+  constructor(id, name, grades, attendance) {
+    this.id = id;
+    this.name = name;
+    this.grades = grades;
+    this.attendance = attendance;
+  }
+  getAverage() {
+    const sum = this.grades.reduce(function (acc, grade) {
+      return acc + grade;
+    }, 0);
+    return sum / this.grades.length;
+  }
+  getGrade() {
+    const avg = this.getAverage();
+    if (avg >= 90) {
+      return "A";
+    } else if (avg >= 80) {
+      return "B";
+    } else if (avg >= 70) {
+      return "C";
+    } else if (avg >= 60) {
+      return "D";
+    } else if (avg >= 50) {
+      return "E";
+    } else {
+      return "F";
     }
-
-    // 2. Add Grade Method
-    addGrade(grade) {
-        if (grade >= 0 && grade <= 100) {
-            this.grades.push(grade);
-            console.log("Grade added successfully");
-        } else {
-            console.log("Invalid grade!");
-        }
+  }
+  getResult() {
+    if (this.getAverage() >= 50 && this.attendance >= 75) {
+      return "Pass";
+    } else {
+      return "Need Review";
     }
-
-    // 3. Analyze Grades Method
-    analyzeGrades() {  
-    if (this.grades.length === 0) {
-        return {
-            average: 0,
-            highest: 0,
-            lowest: 0,
-            passedGrades: []
-        };
-    }
-
-    const total = this.grades.reduce(
-            (sum, grade) => sum + grade, 0
-        );
-
-        const average = total / this.grades.length;
-
-        const highest = Math.max(...this.grades);
-        const lowest = Math.min(...this.grades);
-
-        const passedGrades = this.grades.filter(
-            grade => grade >= 50
-        );
-
-        return {
-            average,
-            highest,
-            lowest,
-            passedGrades
-        };
-    }
+  }
 }
 
-// 4. Create Student Objects
-const students = [
-    new Student("Ahmed", 101, [80, 90, 70]),
-    new Student("Mohamed", 102, [60, 75, 85]),
-    new Student("Ali", 103, [40, 55, 65]),
-    new Student("Sara", 104, [85, 90, 95])
+const studentsList = [
+  new Student(1, "Ahmed Mohamed", [85, 90, 88], 95),
+  new Student(2, "Sara Ali", [45, 42, 48], 80),
+  new Student(3, "Omar Khaled", [70, 65, 72], 88),
+  new Student(4, "Noor Hassan", [48, 44, 40], 70)
 ];
-// Add a new grade
-students[0].addGrade(95);
-students[3].addGrade(88);
-// 5. Check Objects using forEach
-console.log("All Students:");
 
-students.forEach(student => {
-    if (student instanceof Student) {
-        console.log("Name:", student.name);
-        console.log("ID:", student.id);
-        console.log("Grades:", student.grades);
-
-        const result = student.analyzeGrades();
-
-        console.log("Average:", result.average);
-        console.log("Highest Grade:", result.highest);
-        console.log("Lowest Grade:", result.lowest);
-        console.log("Passed Grades:", result.passedGrades);
-
-        console.log("--------------------");
-    }
+console.log("Report");
+studentsList.forEach(function (student) {
+  console.log(student.name, student.getAverage(), student.getGrade(), student.getResult());
 });
 
-// 6. Advanced Filtering
-
-// Students with average greater than or equal to 70
-const excellentStudents = students.filter(student => {
-    return student.analyzeGrades().average >= 70;
+const strugglingStudents = studentsList.filter(function (student) {
+  const avg = student.getAverage();
+  return avg >= 40 && avg < 50;
 });
 
-console.log("Excellent Students:");
-
-excellentStudents.forEach(student => {
-    console.log(student.name);
+const afterMercy = strugglingStudents.map(function (student) {
+  return {
+    name: student.name,
+    oldAverage: student.getAverage(),
+    newAverage: student.getAverage() + 5
+  };
 });
 
-// Students who have a grade below 50
-const studentsWithLowGrades = students.filter(student => {
-    return student.grades.some(grade => grade < 50);
-});
+const sumAfterMercy = afterMercy.reduce(function (acc, student) {
+  return acc + student.newAverage;
+}, 0);
 
-console.log("Students with Low Grades:");
+const mercyAverage = afterMercy.length > 0 ? sumAfterMercy / afterMercy.length : 0;
 
-studentsWithLowGrades.forEach(student => {
-    console.log(student.name);
-});
-
-// 7. Map Function
-const studentNames = students.map(student => student.name);
-
-console.log("Student Names:", studentNames);
-
-// 8. Console Logging
-console.log("Total Students:", students.length);
-console.log("All Students Data:", students);
-
-// Grace Committee
-const strugglingStudents = students.filter(student => {
-    const average = student.analyzeGrades().average;
-    return average >= 40 && average <= 49;
-});
-
-const graceStudents = strugglingStudents.map(student => {
-    return {
-        name: student.name,
-        oldAverage: student.analyzeGrades().average,
-        newAverage: student.analyzeGrades().average +5
-    };
-});
-
-const totalGraceAverage = graceStudents.reduce(
-    (sum, student) => sum + student.newAverage,
-    0
-);
-
-const graceAverage = graceStudents.length > 0
-    ? totalGraceAverage / graceStudents.length
-    : 0;
-
-console.log("Grace Students:", graceStudents);
-console.log("Grace Average:", graceAverage);
-
-    const studentsDiv = document.getElementById("students");
-
-studentsDiv.innerHTML = students.map(student => {
-    const result = student.analyzeGrades();
-
-    return `
-        <div>
-            <h2>${student.name}</h2>
-            <p>Student ID: ${student.id}</p>
-            <p>Grades: ${student.grades.join(", ")}</p>
-            <p>Average: ${result.average}</p>
-            <p>Highest Grade: ${result.highest}</p>
-            <p>Lowest Grade: ${result.lowest}</p>
-        </div>
-        <hr>
-    `;
-}).join("");
-    
-                        
-                        
-                         
+console.log("Struggling After Mercy");
+console.log(afterMercy);
+console.log("Mercy Average");
+console.log(mercyAverage);
+;
